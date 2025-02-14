@@ -44,9 +44,11 @@ in {
   };
 
   config = lib.mkIf config.programs.wazuh.generateCerts {
+
     systemd.services.generate-wazuh-certs = {
       description = "Generate Wazuh SSL Certificates";
       after = [ "network.target" ];
+      before = [ "docker.service" ]; # Générer les certificats avant Docker
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         Type = "oneshot";
@@ -54,6 +56,22 @@ in {
         RemainAfterExit = true;
       };
     };
+
+    # Vérifier que les fichiers sont bien des fichiers avant de les monter
+    assertions = [
+      {
+        assertion = builtins.pathExists "${certDir}/root-ca.pem";
+        message = "root-ca.pem n'existe pas";
+      }
+      {
+        assertion = builtins.pathExists "${certDir}/wazuh.manager.pem";
+        message = "wazuh.manager.pem n'existe pas";
+      }
+      {
+        assertion = builtins.pathExists "${certDir}/wazuh.manager-key.pem";
+        message = "wazuh.manager-key.pem n'existe pas";
+      }
+    ];
 
     # Modifier les volumes pour utiliser les certificats générés
     virtualisation.oci-containers.containers.wazuh-manager.volumes = [
