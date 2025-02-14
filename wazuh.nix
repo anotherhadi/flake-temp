@@ -49,7 +49,7 @@ in {
 
     indexerPassword = lib.mkOption {
       type = lib.types.str;
-      default = "mySecr3tPassword";
+      default = "mySecr3tP4ssword$$";
       description = "Password for the Wazuh Indexer";
     };
 
@@ -61,7 +61,7 @@ in {
 
     apiPassword = lib.mkOption {
       type = lib.types.str;
-      default = "mySecr3tPassword";
+      default = "mySecr3tP4ssword$$";
       description = "Password for the Wazuh API";
     };
 
@@ -73,7 +73,7 @@ in {
 
     dashboardPassword = lib.mkOption {
       type = lib.types.str;
-      default = "mySecr3tPassword";
+      default = "mySecr3tP4ssword$$";
       description = "Password for the Wazuh Dashboard";
     };
   };
