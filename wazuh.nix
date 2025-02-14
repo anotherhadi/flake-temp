@@ -36,7 +36,47 @@ let
   };
 in {
 
-  options.programs.wazuh.enable = lib.mkEnableOption "Enable Wazuh stack";
+  imports = [ ./certs.nix ];
+
+  options.programs.wazuh = {
+    enable = lib.mkEnableOption "Enable Wazuh stack";
+
+    indexerUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Wazuh Indexer";
+    };
+
+    indexerPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "mySecr3tPassword";
+      description = "Password for the Wazuh Indexer";
+    };
+
+    apiUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Wazuh API";
+    };
+
+    apiPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "mySecr3tPassword";
+      description = "Password for the Wazuh API";
+    };
+
+    dashboardUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Wazuh Dashboard";
+    };
+
+    dashboardPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "mySecr3tPassword";
+      description = "Password for the Wazuh Dashboard";
+    };
+  };
 
   config = lib.mkIf config.programs.wazuh.enable {
     # Since we use "--network=host" we need to add the hostnames to /etc/hosts
@@ -62,14 +102,14 @@ in {
             ++ ulimits;
           environment = {
             INDEXER_URL = "https://${wazuh.indexer.hostname}:9200";
-            INDEXER_USERNAME = "admin";
-            INDEXER_PASSWORD = "SecretPassword";
+            INDEXER_USERNAME = config.programs.wazuh.indexerUsername;
+            INDEXER_PASSWORD = config.programs.wazuh.indexerPassword;
             FILEBEAT_SSL_VERIFICATION_MODE = "full";
             SSL_CERTIFICATE_AUTHORITIES = "/etc/ssl/root-ca.pem";
             SSL_CERTIFICATE = "/etc/ssl/filebeat.pem";
             SSL_KEY = "/etc/ssl/filebeat.key";
-            API_USERNAME = "wazuh-wui";
-            API_PASSWORD = "MyS3cr37P450r.*-";
+            API_USERNAME = config.programs.wazuh.apiUsername;
+            API_PASSWORD = config.programs.wazuh.apiPassword;
           };
           ports = [ "1514:1514" "1515:1515" "514:514/udp" "55000:55000" ];
           volumes = [
@@ -84,15 +124,6 @@ in {
             "wazuh_wodles:/var/ossec/wodles"
             "filebeat_etc:/etc/filebeat"
             "filebeat_var:/var/lib/filebeat"
-            "${
-              ./config/wazuh_indexer_ssl_certs/root-ca-manager.pem
-            }:/etc/ssl/root-ca.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/wazuh.manager.pem
-            }:/etc/ssl/filebeat.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/wazuh.manager-key.pem
-            }:/etc/ssl/filebeat.key"
             "${
               ./config/wazuh_cluster/wazuh_manager.conf
             }:/wazuh-config-mount/etc/ossec.conf"
@@ -112,21 +143,6 @@ in {
           volumes = [
             "wazuh-indexer-data:/var/lib/wazuh-indexer"
             "${
-              ./config/wazuh_indexer_ssl_certs/root-ca.pem
-            }:/usr/share/wazuh-indexer/certs/root-ca.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/wazuh.indexer-key.pem
-            }:/usr/share/wazuh-indexer/certs/wazuh.indexer.key"
-            "${
-              ./config/wazuh_indexer_ssl_certs/wazuh.indexer.pem
-            }:/usr/share/wazuh-indexer/certs/wazuh.indexer.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/admin.pem
-            }:/usr/share/wazuh-indexer/certs/admin.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/admin-key.pem
-            }:/usr/share/wazuh-indexer/certs/admin-key.pem"
-            "${
               ./config/wazuh_indexer/wazuh.indexer.yml
             }:/usr/share/wazuh-indexer/opensearch.yml"
             "${
@@ -142,26 +158,17 @@ in {
           autoStart = true;
           ports = [ "443:5601" ];
           environment = {
-            INDEXER_USERNAME = "admin ";
-            INDEXER_PASSWORD = "SecretPassword";
+            INDEXER_USERNAME = config.programs.wazuh.indexerUsername;
+            INDEXER_PASSWORD = config.programs.wazuh.indexerPassword;
             WAZUH_API_URL = "https://${wazuh.manager.hostname}";
-            DASHBOARD_USERNAME = "kibanaserver";
-            DASHBOARD_PASSWORD = "kibanaserver";
-            API_USERNAME = "wazuh-wui";
-            API_PASSWORD = "MyS3cr37P450r.*-";
+            DASHBOARD_USERNAME = config.programs.wazuh.dashboardUsername;
+            DASHBOARD_PASSWORD = config.programs.wazuh.dashboardPassword;
+            API_USERNAME = config.programs.wazuh.apiUsername;
+            API_PASSWORD = config.programs.wazuh.apiPassword;
           };
           extraOptions = [ "--network=host" ];
           dependsOn = [ "wazuh-indexer" ];
           volumes = [
-            "${
-              ./config/wazuh_indexer_ssl_certs/wazuh.dashboard.pem
-            }:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/wazuh.dashboard-key.pem
-            }:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem"
-            "${
-              ./config/wazuh_indexer_ssl_certs/root-ca.pem
-            }:/usr/share/wazuh-dashboard/certs/root-ca.pem"
             "${
               ./config/wazuh_dashboard/opensearch_dashboards.yml
             }:/usr/share/wazuh-dashboard/config/opensearch_dashboards.yml"
