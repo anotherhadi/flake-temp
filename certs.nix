@@ -58,11 +58,11 @@ in {
       };
     };
 
-    virtualisation.oci-containers.containers.wazuh-manager.after =
+    virtualisation.oci-containers.containers.wazuh-manager.dependsOn =
       [ "generate-wazuh-certs" ];
-    virtualisation.oci-containers.containers.wazuh-dashboard.after =
+    virtualisation.oci-containers.containers.wazuh-dashboard.dependsOn =
       [ "generate-wazuh-certs" ];
-    virtualisation.oci-containers.containers.wazuh-indexer.after =
+    virtualisation.oci-containers.containers.wazuh-indexer.dependsOn =
       [ "generate-wazuh-certs" ];
 
     # Modifier les volumes pour utiliser les certificats générés
