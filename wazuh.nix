@@ -6,6 +6,42 @@ in {
 
   options.programs.wazuh = {
     enable = lib.mkEnableOption "Enable Wazuh stack";
+
+    indexerUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Wazuh Indexer";
+    };
+
+    indexerPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "MyS3cr37P450r.*-.";
+      description = "Password for the Wazuh Indexer";
+    };
+
+    apiUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Wazuh API";
+    };
+
+    apiPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "MyS3cr37P450r.*-.";
+      description = "Password for the Wazuh API";
+    };
+
+    dashboardUsername = lib.mkOption {
+      type = lib.types.str;
+      default = "admin";
+      description = "Username for the Wazuh Dashboard";
+    };
+
+    dashboardPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "MyS3cr37P450r.*-.";
+      description = "Password for the Wazuh Dashboard";
+    };
   };
 
   config = lib.mkIf config.programs.wazuh.enable {
@@ -44,14 +80,14 @@ in {
               - "55000:55000"
             environment:
               INDEXER_URL: https://wazuh.indexer:9200
-              INDEXER_USERNAME: admin
-              INDEXER_PASSWORD: admin
+              INDEXER_USERNAME: ${config.programs.wazuh.indexerUsername}
+              INDEXER_PASSWORD: ${config.programs.wazuh.indexerPassword}
               FILEBEAT_SSL_VERIFICATION_MODE: full
               SSL_CERTIFICATE_AUTHORITIES: /etc/ssl/root-ca.pem
               SSL_CERTIFICATE: /etc/ssl/filebeat.pem
               SSL_KEY: /etc/ssl/filebeat.key
-              API_USERNAME: wazuh-wui
-              API_PASSWORD: MyS3cr37P450r.*-
+              API_USERNAME: ${config.programs.wazuh.apiUsername}
+              API_PASSWORD: ${config.programs.wazuh.apiPassword}
             volumes:
               - wazuh_api_configuration:/var/ossec/ap/etc/wazuh/configuration
               - wazuh_etc:/var/ossec/etc
@@ -136,10 +172,10 @@ in {
               - 443:5601
             environment:
               WAZUH_API_URL: https://wazuh.manager
-              DASHBOARD_USERNAME: kibanaserver
-              DASHBOARD_PASSWORD: kibanaserver
-              API_USERNAME: wazuh-wui
-              API_PASSWORD: MyS3cr37P450r.*-
+              DASHBOARD_USERNAME: ${config.programs.wazuh.dashboardUsername}
+              DASHBOARD_PASSWORD: ${config.programs.wazuh.dashboardPassword}
+              API_USERNAME: ${config.programs.wazuh.apiUsername}
+              API_PASSWORD: ${config.programs.wazuh.apiPassword}
               SERVER_HOST: 0.0.0.0
               SERVER_PORT: 5601
               OPENSEARCH_HOSTS: https://wazuh.indexer:9200
