@@ -1,5 +1,5 @@
 { pkgs, lib, config, ... }:
-let version = "4.7.3";
+let version = "4.10.1";
 in {
 
   imports = [ ./certs.nix ];
@@ -25,10 +25,9 @@ in {
       #yaml
       ''
         # Wazuh App Copyright (C) 2017, Wazuh Inc. (License GPLv2)
-        version: '3.7'
         services:
           wazuh.manager:
-            image: wazuh/wazuh-manager:5.0.0
+            image: wazuh/wazuh-manager:${version}
             hostname: wazuh.manager
             restart: unless-stopped
             ulimits:
@@ -71,7 +70,7 @@ in {
               - /etc/wazuh/config/wazuh_cluster/wazuh_manager.conf:/wazuh-config-mount/etc/ossec.conf
 
           wazuh.indexer:
-            image: wazuh/wazuh-indexer:5.0.0
+            image: wazuh/wazuh-indexer:${version}
             hostname: wazuh.indexer
             restart: unless-stopped
             ulimits:
@@ -123,7 +122,7 @@ in {
               # - /etc/wazuh/config/wazuh_indexer/wazuh.indexer.yml:/usr/share/wazuh-indexer/opensearch.yml
 
           wazuh.dashboard:
-            image: wazuh/wazuh-dashboard:5.0.0
+            image: wazuh/wazuh-dashboard:${version}
             hostname: wazuh.dashboard
             restart: unless-stopped
             ulimits:
@@ -187,7 +186,7 @@ in {
 
     systemd.services.wazuh-docker = {
       description = "Start Wazuh containers using Docker Compose";
-      after = [ "generate-wazuh-certs.service" "docker.service" ];
+      after = [ "wazuh-certs.service" "docker.service" ];
       requires = [ "docker.service" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {

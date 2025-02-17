@@ -42,7 +42,7 @@ in {
   };
 
   config = lib.mkIf config.programs.wazuh.generateCerts {
-    systemd.services.generate-wazuh-certs = {
+    systemd.services.wazuh-certs = {
       description = "Generate Wazuh SSL Certificates";
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
