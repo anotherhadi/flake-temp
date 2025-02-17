@@ -1,6 +1,6 @@
 { pkgs, lib, config, ... }:
 let
-  certDir = "/var/lib/wazuh-certs";
+  certDir = "/var/lib/wazuh-certificates";
 
   generateCertsScript = pkgs.writeShellScriptBin "generate-wazuh-certs" ''
     set -e
