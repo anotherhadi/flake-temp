@@ -15,6 +15,9 @@ let
         ${pkgs.openssl}/bin/openssl req -new -key "$name-key.pem" -out "$name.csr" -subj "/C=FR/ST=Paris/L=Paris/O=Wazuh/OU=$name/CN=$name"
         ${pkgs.openssl}/bin/openssl x509 -req -in "$name.csr" -CA root-ca.pem -CAkey root-ca.key -CAcreateserial -out "$name.pem" -days "$days_valid" -sha256
         rm "$name.csr"
+        # DEBUG
+        chmod 644 "$name.pem"
+        chmod 644 "$name-key.pem"
     }
 
     # Générer l'autorité de certification (CA)
