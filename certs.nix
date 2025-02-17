@@ -1,6 +1,6 @@
 { pkgs, lib, config, ... }:
 let
-  certDir = "/etc/wazuh/certs";
+  certDir = "/etc/wazuh/config/wazuh_indexer_ssl_certs";
 
   generateCertsScript = pkgs.writeShellScriptBin "generate-wazuh-certs" ''
     set -e
@@ -29,6 +29,7 @@ let
       generate_cert "wazuh.indexer"
       generate_cert "admin"
       cp root-ca.pem root-ca-manager.pem
+      cp root-ca.key root-ca-manager.key
       generate_cert "wazuh.manager"
       generate_cert "wazuh.dashboard"
     fi
