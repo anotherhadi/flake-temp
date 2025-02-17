@@ -57,25 +57,25 @@ in {
       };
     };
 
-    # Modifier les volumes pour utiliser les certificats générés
-    virtualisation.oci-containers.containers.wazuh-manager.volumes = [
-      "${certDir}/root-ca.pem:/etc/ssl/root-ca.pem"
-      "${certDir}/wazuh.manager.pem:/etc/ssl/filebeat.pem"
-      "${certDir}/wazuh.manager-key.pem:/etc/ssl/filebeat.key"
-    ];
-
-    virtualisation.oci-containers.containers.wazuh-indexer.volumes = [
-      "${certDir}/root-ca.pem:/usr/share/wazuh-indexer/certs/root-ca.pem"
-      "${certDir}/wazuh.indexer-key.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.key"
-      "${certDir}/wazuh.indexer.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.pem"
-      "${certDir}/admin.pem:/usr/share/wazuh-indexer/certs/admin.pem"
-      "${certDir}/admin-key.pem:/usr/share/wazuh-indexer/certs/admin-key.pem"
-    ];
-
-    virtualisation.oci-containers.containers.wazuh-dashboard.volumes = [
-      "${certDir}/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem"
-      "${certDir}/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem"
-      "${certDir}/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem"
-    ];
+    # # Modifier les volumes pour utiliser les certificats générés
+    # virtualisation.oci-containers.containers.wazuh-manager.volumes = [
+    #   "${certDir}/root-ca.pem:/etc/ssl/root-ca.pem"
+    #   "${certDir}/wazuh.manager.pem:/etc/ssl/filebeat.pem"
+    #   "${certDir}/wazuh.manager-key.pem:/etc/ssl/filebeat.key"
+    # ];
+    #
+    # virtualisation.oci-containers.containers.wazuh-indexer.volumes = [
+    #   "${certDir}/root-ca.pem:/usr/share/wazuh-indexer/certs/root-ca.pem"
+    #   "${certDir}/wazuh.indexer-key.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.key"
+    #   "${certDir}/wazuh.indexer.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.pem"
+    #   "${certDir}/admin.pem:/usr/share/wazuh-indexer/certs/admin.pem"
+    #   "${certDir}/admin-key.pem:/usr/share/wazuh-indexer/certs/admin-key.pem"
+    # ];
+    #
+    # virtualisation.oci-containers.containers.wazuh-dashboard.volumes = [
+    #   "${certDir}/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem"
+    #   "${certDir}/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem"
+    #   "${certDir}/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem"
+    # ];
   };
 }
