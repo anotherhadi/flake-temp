@@ -22,9 +22,9 @@ let
       local certfile="$name.pem"
 
       if [ ! -f "$certfile" ]; then
-        openssl genrsa -out $keyfile 2048
-        openssl req -new -key $keyfile -out $csrfile -subj "/CN=$name"
-        openssl x509 -req -in $csrfile -CA root-ca.pem -CAkey root-ca.key -CAcreateserial -out $certfile -days 3650 -sha256
+        ${pkgs.openssl} genrsa -out $keyfile 2048
+        ${pkgs.openssl} req -new -key $keyfile -out $csrfile -subj "/CN=$name"
+        ${pkgs.openssl} x509 -req -in $csrfile -CA root-ca.pem -CAkey root-ca.key -CAcreateserial -out $certfile -days 3650 -sha256
       fi
     }
 
