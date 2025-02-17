@@ -27,13 +27,13 @@ in {
 
     password = lib.mkOption {
       type = lib.types.str;
-      default = "MyS3cr37P450r.*-.";
+      default = "HMthisismys3cr3tP5ssword34a;";
       description = "Password for Wazuh";
     };
 
     hashedPassword = lib.mkOption {
       type = lib.types.str;
-      default = "$2y$12$bKZqvo2g00yurIMot.j1uuWIrlRMTUw0mmBmqmgka9nR1AwEAAUwu";
+      default = "$2y$12$LVxMAZcNCQoYceQwkRQ/bONzDiNKW/dPF6rIQvAoUpV1fEO7PXi/G";
       description = "Bcrypt hashed password for Wazuh";
     };
   };
