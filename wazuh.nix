@@ -4,6 +4,7 @@ let
 
   wazuh-reload = pkgs.writeShellScriptBin "wazuh-reload" ''
     set -e
+    sleep 60
     docker exec -it single-node-wazuh.indexer-1 bash "export INSTALLATION_DIR=/usr/share/wazuh-indexer"
     docker exec -it single-node-wazuh.indexer-1 bash "CACERT=$INSTALLATION_DIR/certs/root-ca.pem"
     docker exec -it single-node-wazuh.indexer-1 bash "KEY=$INSTALLATION_DIR/certs/admin-key.pem"
@@ -18,40 +19,22 @@ in {
   options.programs.wazuh = {
     enable = lib.mkEnableOption "Enable Wazuh stack";
 
-    indexerUsername = lib.mkOption {
-      type = lib.types.str;
-      default = "admin";
-      description = "Username for the Wazuh Indexer";
-    };
-
-    indexerPassword = lib.mkOption {
-      type = lib.types.str;
-      default = "MyS3cr37P450r.*-.";
-      description = "Password for the Wazuh Indexer";
-    };
-
-    apiUsername = lib.mkOption {
-      type = lib.types.str;
-      default = "admin";
-      description = "Username for the Wazuh API";
-    };
-
-    apiPassword = lib.mkOption {
-      type = lib.types.str;
-      default = "MyS3cr37P450r.*-.";
-      description = "Password for the Wazuh API";
-    };
-
-    dashboardUsername = lib.mkOption {
+    username = lib.mkOption {
       type = lib.types.str;
       default = "administrator";
-      description = "Username for the Wazuh Dashboard";
+      description = "Username for Wazuh";
     };
 
-    dashboardPassword = lib.mkOption {
+    password = lib.mkOption {
       type = lib.types.str;
       default = "MyS3cr37P450r.*-.";
-      description = "Password for the Wazuh Dashboard";
+      description = "Password for Wazuh";
+    };
+
+    hashedPassword = lib.mkOption {
+      type = lib.types.str;
+      default = "$2y$12$bKZqvo2g00yurIMot.j1uuWIrlRMTUw0mmBmqmgka9nR1AwEAAUwu";
+      description = "Bcrypt hashed password for Wazuh";
     };
   };
 
@@ -72,9 +55,29 @@ in {
     environment.etc."wazuh/config/wazuh_dashboard" = {
       source = ./config/wazuh_dashboard;
     };
-    environment.etc."wazuh/config/wazuh_indexer" = {
-      source = ./config/wazuh_indexer;
+    environment.etc."wazuh/config/wazuh_indexer/wazuh.indexer.yml" = {
+      source = ./config/wazuh_indexer/wazuh.indexer.yml;
     };
+    environment.etc."wazuh/config/wazuh_indexer/internal_users.yml".text = ''
+      ---
+      # This is the internal user database
+      # The hash value is a bcrypt hash and can be generated with plugin/tools/hash.sh
+
+      _meta:
+        type: "internalusers"
+        config_version: 2
+
+      # Define your internal users here
+
+      ## Demo users
+
+      admin:
+        hash: "${config.programs.wazuh.hashedPassword}"
+        reserved: true
+        backend_roles:
+        - "admin"
+    '';
+
     environment.etc."wazuh/config/certs.yml" = { source = ./config/certs.yml; };
 
     environment.etc."wazuh/docker-compose.yml".text =
@@ -100,14 +103,14 @@ in {
               - "55000:55000"
             environment:
               - INDEXER_URL=https://wazuh.indexer:9200
-              - INDEXER_USERNAME=${config.programs.wazuh.indexerUsername}
-              - INDEXER_PASSWORD=${config.programs.wazuh.indexerPassword}
+              - INDEXER_USERNAME=${config.programs.wazuh.username}
+              - INDEXER_PASSWORD=${config.programs.wazuh.password}
               - FILEBEAT_SSL_VERIFICATION_MODE=full
               - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
               - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
               - SSL_KEY=/etc/ssl/filebeat.key
-              - API_USERNAME=${config.programs.wazuh.apiUsername}
-              - API_PASSWORD=${config.programs.wazuh.apiPassword}
+              - API_USERNAME=${config.programs.wazuh.username}
+              - API_PASSWORD=${config.programs.wazuh.password}
             volumes:
               - wazuh_api_configuration:/var/ossec/api/configuration
               - wazuh_etc:/var/ossec/etc
@@ -160,10 +163,10 @@ in {
               - INDEXER_USERNAME=admin
               - INDEXER_PASSWORD=SecretPassword
               - WAZUH_API_URL=https://wazuh.manager
-              - DASHBOARD_USERNAME=${config.programs.wazuh.dashboardUsername}
-              - DASHBOARD_PASSWORD=${config.programs.wazuh.dashboardPassword}
-              - API_USERNAME=${config.programs.wazuh.apiUsername}
-              - API_PASSWORD=${config.programs.wazuh.apiPassword}
+              - DASHBOARD_USERNAME=${config.programs.wazuh.username}
+              - DASHBOARD_PASSWORD=${config.programs.wazuh.password}
+              - API_USERNAME=${config.programs.wazuh.username}
+              - API_PASSWORD=${config.programs.wazuh.password}
             volumes:
               - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem
               - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem
