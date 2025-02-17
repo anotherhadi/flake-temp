@@ -55,7 +55,16 @@ in {
       allowedUDPPorts = [ 514 ];
     };
 
-    environment.etc."wazuh/config" = { source = ./config; };
+    environment.etc."wazuh/config/wazuh_cluster" = {
+      source = ./config/wazuh_cluster;
+    };
+    environment.etc."wazuh/config/wazuh_dashboard" = {
+      source = ./config/wazuh_dashboard;
+    };
+    environment.etc."wazuh/config/wazuh_indexer" = {
+      source = ./config/wazuh_indexer;
+    };
+    environment.etc."wazuh/config/certs.yml" = { source = ./config/certs.yml; };
 
     environment.etc."wazuh/docker-compose.yml".text =
       #yaml
