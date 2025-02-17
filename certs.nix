@@ -8,31 +8,29 @@ let
     mkdir -p ${certDir}
     cd ${certDir}
 
-    # Générer l'autorité de certification (CA)
-    if [ ! -f root-ca.pem ]; then
-      ${pkgs.openssl} genrsa -out root-ca.key 2048
-      ${pkgs.openssl} req -x509 -new -nodes -key root-ca.key -sha256 -days 3650 -out root-ca.pem -subj "/CN=Wazuh Root CA"
-    fi
-
     # Fonction pour générer un certificat signé par la CA
     generate_cert() {
-      local name=$1
-      local keyfile="$name-key.pem"
-      local csrfile="$name.csr"
-      local certfile="$name.pem"
-
-      if [ ! -f "$certfile" ]; then
-        ${pkgs.openssl} genrsa -out $keyfile 2048
-        ${pkgs.openssl} req -new -key $keyfile -out $csrfile -subj "/CN=$name"
-        ${pkgs.openssl} x509 -req -in $csrfile -CA root-ca.pem -CAkey root-ca.key -CAcreateserial -out $certfile -days 3650 -sha256
-      fi
+        local name=$1
+        ${pkgs.openssl}/bin/openssl genrsa -out "$name-key.pem" 2048
+        ${pkgs.openssl}/bin/openssl req -new -key "$name-key.pem" -out "$name.csr" -subj "/C=FR/ST=Paris/L=Paris/O=Wazuh/OU=$name/CN=$name"
+        ${pkgs.openssl}/bin/openssl x509 -req -in "$name.csr" -CA root-ca.pem -CAkey root-ca.key -CAcreateserial -out "$name.pem" -days "$days_valid" -sha256
+        rm "$name.csr"
     }
 
-    # Génération des certificats pour les composants Wazuh
-    generate_cert "wazuh.manager"
-    generate_cert "wazuh.indexer"
-    generate_cert "wazuh.dashboard"
-    generate_cert "admin"
+
+    # Générer l'autorité de certification (CA)
+    if [ ! -f root-ca.pem ]; then
+      ${pkgs.openssl}/bin/openssl genrsa -out root-ca.key 4096
+      ${pkgs.openssl}/bin/openssl req -x509 -new -nodes -key root-ca.key -sha256 -days "$days_valid" -out root-ca.pem -subj "/C=FR/ST=Paris/L=Paris/O=Wazuh/OU=Security/CN=root-ca"
+
+      # Génération des certificats pour les composants Wazuh
+      generate_cert "wazuh.indexer"
+      generate_cert "admin"
+      cp root-ca.pem root-ca-manager.pem
+      generate_cert "wazuh.manager"
+      generate_cert "wazuh.dashboard"
+    fi
+
   '';
 
 in {
@@ -56,22 +54,6 @@ in {
         RemainAfterExit = true;
       };
     };
-
-    # Vérifier que les fichiers sont bien des fichiers avant de les monter
-    assertions = [
-      {
-        assertion = builtins.pathExists "${certDir}/root-ca.pem";
-        message = "root-ca.pem n'existe pas";
-      }
-      {
-        assertion = builtins.pathExists "${certDir}/wazuh.manager.pem";
-        message = "wazuh.manager.pem n'existe pas";
-      }
-      {
-        assertion = builtins.pathExists "${certDir}/wazuh.manager-key.pem";
-        message = "wazuh.manager-key.pem n'existe pas";
-      }
-    ];
 
     # Modifier les volumes pour utiliser les certificats générés
     virtualisation.oci-containers.containers.wazuh-manager.volumes = [
