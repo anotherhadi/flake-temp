@@ -1,13 +1,11 @@
 { pkgs, lib, config, ... }:
 let
-  certDir = "/var/lib/wazuh-certificates3";
+  certDir = "/etc/wazuh/certs";
 
   generateCertsScript = pkgs.writeShellScriptBin "generate-wazuh-certs" ''
     set -e
-
     mkdir -p ${certDir}
     cd ${certDir}
-
     days_valid=3650
 
     # Fonction pour générer un certificat signé par la CA
@@ -18,7 +16,6 @@ let
         ${pkgs.openssl}/bin/openssl x509 -req -in "$name.csr" -CA root-ca.pem -CAkey root-ca.key -CAcreateserial -out "$name.pem" -days "$days_valid" -sha256
         rm "$name.csr"
     }
-
 
     # Générer l'autorité de certification (CA)
     if [ ! -f root-ca.pem ]; then
@@ -45,11 +42,9 @@ in {
   };
 
   config = lib.mkIf config.programs.wazuh.generateCerts {
-
     systemd.services.generate-wazuh-certs = {
       description = "Generate Wazuh SSL Certificates";
       after = [ "network.target" ];
-      before = [ "docker.service" ]; # Générer les certificats avant Docker
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         Type = "oneshot";
@@ -57,33 +52,5 @@ in {
         RemainAfterExit = true;
       };
     };
-
-    virtualisation.oci-containers.containers.wazuh-manager.dependsOn =
-      [ "generate-wazuh-certs" ];
-    virtualisation.oci-containers.containers.wazuh-dashboard.dependsOn =
-      [ "generate-wazuh-certs" ];
-    virtualisation.oci-containers.containers.wazuh-indexer.dependsOn =
-      [ "generate-wazuh-certs" ];
-
-    # Modifier les volumes pour utiliser les certificats générés
-    virtualisation.oci-containers.containers.wazuh-manager.volumes = [
-      "${certDir}/root-ca.pem:/etc/ssl/root-ca.pem"
-      "${certDir}/wazuh.manager.pem:/etc/ssl/filebeat.pem"
-      "${certDir}/wazuh.manager-key.pem:/etc/ssl/filebeat.key"
-    ];
-
-    virtualisation.oci-containers.containers.wazuh-indexer.volumes = [
-      "${certDir}/root-ca.pem:/usr/share/wazuh-indexer/certs/root-ca.pem"
-      "${certDir}/wazuh.indexer-key.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.key"
-      "${certDir}/wazuh.indexer.pem:/usr/share/wazuh-indexer/certs/wazuh.indexer.pem"
-      "${certDir}/admin.pem:/usr/share/wazuh-indexer/certs/admin.pem"
-      "${certDir}/admin-key.pem:/usr/share/wazuh-indexer/certs/admin-key.pem"
-    ];
-
-    virtualisation.oci-containers.containers.wazuh-dashboard.volumes = [
-      "${certDir}/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem"
-      "${certDir}/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem"
-      "${certDir}/root-ca.pem:/usr/share/wazuh-dashboard/certs/root-ca.pem"
-    ];
   };
 }
