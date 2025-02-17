@@ -8,6 +8,8 @@ let
     mkdir -p ${certDir}
     cd ${certDir}
 
+    days_valid=3650
+
     # Fonction pour générer un certificat signé par la CA
     generate_cert() {
         local name=$1
