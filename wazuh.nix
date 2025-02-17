@@ -1,5 +1,16 @@
 { pkgs, lib, config, ... }:
-let version = "4.10.1";
+let
+  version = "4.10.1";
+
+  wazuh-reload = pkgs.writeShellScriptBin "wazuh-reload" ''
+    set -e
+    docker exec -it single-node-wazuh.indexer-1 bash "export INSTALLATION_DIR=/usr/share/wazuh-indexer"
+    docker exec -it single-node-wazuh.indexer-1 bash "CACERT=$INSTALLATION_DIR/certs/root-ca.pem"
+    docker exec -it single-node-wazuh.indexer-1 bash "KEY=$INSTALLATION_DIR/certs/admin-key.pem"
+    docker exec -it single-node-wazuh.indexer-1 bash "CERT=$INSTALLATION_DIR/certs/admin.pem"
+    docker exec -it single-node-wazuh.indexer-1 bash "export JAVA_HOME=/usr/share/wazuh-indexer/jdk"
+    docker exec -it single-node-wazuh.indexer-1 bash "bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert  $CACERT -cert $CERT -key $KEY -p 9200 -icl"
+  '';
 in {
 
   imports = [ ./certs.nix ];
@@ -194,6 +205,17 @@ in {
         WorkingDirectory = "/etc/wazuh";
         ExecStart = "${pkgs.docker-compose}/bin/docker-compose up";
         ExecStop = "${pkgs.docker-compose}/bin/docker-compose down";
+        Restart = "always";
+      };
+    };
+
+    systemd.services.wazuh-reload-auth = {
+      description = "";
+      after = [ "wazuh-docker.service" "docker.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = "${wazuh-reload}/bin/wazuh-reload";
         Restart = "always";
       };
     };
