@@ -21,7 +21,7 @@ in {
 
     username = lib.mkOption {
       type = lib.types.str;
-      default = "administrator";
+      default = "admin";
       description = "Username for Wazuh";
     };
 
