@@ -5,12 +5,12 @@ let
   wazuh-reload = pkgs.writeShellScriptBin "wazuh-reload" ''
     set -e
     sleep 60
-    docker exec -it single-node-wazuh.indexer-1 bash "export INSTALLATION_DIR=/usr/share/wazuh-indexer"
-    docker exec -it single-node-wazuh.indexer-1 bash "CACERT=$INSTALLATION_DIR/certs/root-ca.pem"
-    docker exec -it single-node-wazuh.indexer-1 bash "KEY=$INSTALLATION_DIR/certs/admin-key.pem"
-    docker exec -it single-node-wazuh.indexer-1 bash "CERT=$INSTALLATION_DIR/certs/admin.pem"
-    docker exec -it single-node-wazuh.indexer-1 bash "export JAVA_HOME=/usr/share/wazuh-indexer/jdk"
-    docker exec -it single-node-wazuh.indexer-1 bash "bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert  $CACERT -cert $CERT -key $KEY -p 9200 -icl"
+    ${pkgs.docker}/bin/docker exec -it single-node-wazuh.indexer-1 bash "export INSTALLATION_DIR=/usr/share/wazuh-indexer"
+    ${pkgs.docker}/bin/docker exec -it single-node-wazuh.indexer-1 bash "CACERT=$INSTALLATION_DIR/certs/root-ca.pem"
+    ${pkgs.docker}/bin/docker exec -it single-node-wazuh.indexer-1 bash "KEY=$INSTALLATION_DIR/certs/admin-key.pem"
+    ${pkgs.docker}/bin/docker exec -it single-node-wazuh.indexer-1 bash "CERT=$INSTALLATION_DIR/certs/admin.pem"
+    ${pkgs.docker}/bin/docker exec -it single-node-wazuh.indexer-1 bash "export JAVA_HOME=/usr/share/wazuh-indexer/jdk"
+    ${pkgs.docker}/bin/docker exec -it single-node-wazuh.indexer-1 bash "bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert  $CACERT -cert $CERT -key $KEY -p 9200 -icl"
   '';
 in {
 
