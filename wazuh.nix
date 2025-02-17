@@ -33,7 +33,7 @@ in {
 
     hashedPassword = lib.mkOption {
       type = lib.types.str;
-      default = "$2y$12$LVxMAZcNCQoYceQwkRQ/bONzDiNKW/dPF6rIQvAoUpV1fEO7PXi/G";
+      default = "$2y$12$MHyIz80KY58QdLxCQoRZv.k0kKt6WA6pwmAa4apPV.e2KrR1SslNC";
       description = "Bcrypt hashed password for Wazuh";
     };
   };
@@ -219,7 +219,6 @@ in {
       serviceConfig = {
         Type = "oneshot";
         ExecStart = "${wazuh-reload}/bin/wazuh-reload";
-        Restart = "always";
       };
     };
   };
