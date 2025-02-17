@@ -52,12 +52,21 @@ in {
     environment.etc."wazuh/config/wazuh_cluster" = {
       source = ./config/wazuh_cluster;
     };
-    environment.etc."wazuh/config/wazuh_dashboard" = {
-      source = ./config/wazuh_dashboard;
+    environment.etc."wazuh/config/wazuh_dashboard/opensearch_dashboards.yml" = {
+      source = ./config/wazuh_dashboard/opensearch_dashboards.yml;
     };
     environment.etc."wazuh/config/wazuh_indexer/wazuh.indexer.yml" = {
       source = ./config/wazuh_indexer/wazuh.indexer.yml;
     };
+    environment.etc."wazuh/config/wazuh_dashboard/wazuh.yml".text = ''
+      hosts:
+        - 1513629884013:
+            url: "https://wazuh.manager"
+            port: 55000
+            username: ${config.programs.wazuh.username}
+            password: "${config.programs.wazuh.password}"
+            run_as: false
+    '';
     environment.etc."wazuh/config/wazuh_indexer/internal_users.yml".text = ''
       ---
       # This is the internal user database
