@@ -58,6 +58,13 @@ in {
       };
     };
 
+    virtualisation.oci-containers.containers.wazuh-manager.after =
+      [ "generate-wazuh-certs" ];
+    virtualisation.oci-containers.containers.wazuh-dashboard.after =
+      [ "generate-wazuh-certs" ];
+    virtualisation.oci-containers.containers.wazuh-indexer.after =
+      [ "generate-wazuh-certs" ];
+
     # Modifier les volumes pour utiliser les certificats générés
     virtualisation.oci-containers.containers.wazuh-manager.volumes = [
       "${certDir}/root-ca.pem:/etc/ssl/root-ca.pem"

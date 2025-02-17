@@ -96,7 +96,7 @@ in {
         wazuh-manager = {
           hostname = wazuh.manager.hostname;
           image = "wazuh/wazuh-manager:${version}";
-          autoStart = false;
+          autoStart = true;
           imageFile = wazuh.manager.image;
           extraOptions = [ "--network=host" "--ulimit" "nofile=655360:655360" ]
             ++ ulimits;
@@ -134,7 +134,7 @@ in {
           hostname = wazuh.indexer.hostname;
           image = "wazuh/wazuh-indexer:${version}";
           imageFile = wazuh.indexer.image;
-          autoStart = false;
+          autoStart = true;
           extraOptions = [ "--network=host" "--ulimit" "nofile=65536:65536" ]
             ++ ulimits;
           dependsOn = [ ];
@@ -155,7 +155,7 @@ in {
           hostname = wazuh.dashboard.hostname;
           image = "wazuh/wazuh-dashboard:${version}";
           imageFile = wazuh.dashboard.image;
-          autoStart = false;
+          autoStart = true;
           ports = [ "443:5601" ];
           environment = {
             INDEXER_USERNAME = config.programs.wazuh.indexerUsername;
