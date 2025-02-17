@@ -225,8 +225,7 @@ in {
     systemd.paths.wazuh-config-watch = {
       description = "Watch Wazuh config changes";
       pathConfig = {
-        PathModified = "/etc/wazuh/config";
-        PathModified = "/etc/wazuh/docker-compose.yml";
+        PathModified = [ "/etc/wazuh/config" "/etc/wazuh/docker-compose.yml" ];
       };
       install = { WantedBy = [ "multi-user.target" ]; };
     };
