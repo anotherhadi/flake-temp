@@ -72,7 +72,7 @@ in {
         # Wazuh App Copyright (C) 2017, Wazuh Inc. (License GPLv2)
         services:
           wazuh.manager:
-            image: wazuh/wazuh-manager:4.10.1
+            image: wazuh/wazuh-manager:${version}
             hostname: wazuh.manager
             restart: always
             ulimits:
@@ -89,14 +89,14 @@ in {
               - "55000:55000"
             environment:
               - INDEXER_URL=https://wazuh.indexer:9200
-              - INDEXER_USERNAME=admin
-              - INDEXER_PASSWORD=SecretPassword
+              - INDEXER_USERNAME=${config.programs.wazuh.indexerUsername}
+              - INDEXER_PASSWORD=${config.programs.wazuh.indexerPassword}
               - FILEBEAT_SSL_VERIFICATION_MODE=full
               - SSL_CERTIFICATE_AUTHORITIES=/etc/ssl/root-ca.pem
               - SSL_CERTIFICATE=/etc/ssl/filebeat.pem
               - SSL_KEY=/etc/ssl/filebeat.key
-              - API_USERNAME=wazuh-wui
-              - API_PASSWORD=MyS3cr37P450r.*-
+              - API_USERNAME=${config.programs.wazuh.apiUsername}
+              - API_PASSWORD=${config.programs.wazuh.apiPassword}
             volumes:
               - wazuh_api_configuration:/var/ossec/api/configuration
               - wazuh_etc:/var/ossec/etc
@@ -149,10 +149,10 @@ in {
               - INDEXER_USERNAME=admin
               - INDEXER_PASSWORD=SecretPassword
               - WAZUH_API_URL=https://wazuh.manager
-              - DASHBOARD_USERNAME=kibanaserver
-              - DASHBOARD_PASSWORD=kibanaserver
-              - API_USERNAME=wazuh-wui
-              - API_PASSWORD=MyS3cr37P450r.*-
+              - DASHBOARD_USERNAME=${config.programs.wazuh.dashboardUsername}
+              - DASHBOARD_PASSWORD=${config.programs.wazuh.dashboardPassword}
+              - API_USERNAME=${config.programs.wazuh.apiUsername}
+              - API_PASSWORD=${config.programs.wazuh.apiPassword}
             volumes:
               - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard.pem
               - ./config/wazuh_indexer_ssl_certs/wazuh.dashboard-key.pem:/usr/share/wazuh-dashboard/certs/wazuh-dashboard-key.pem
