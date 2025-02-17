@@ -5,12 +5,12 @@ let
   wazuh-reload = pkgs.writeShellScriptBin "wazuh-reload" ''
     set -e
     sleep 60
-    ${pkgs.docker}/bin/docker exec -it wazuh-wazuh.indexer-1 bash "export INSTALLATION_DIR=/usr/share/wazuh-indexer"
-    ${pkgs.docker}/bin/docker exec -it wazuh-wazuh.indexer-1 bash "CACERT=$INSTALLATION_DIR/certs/root-ca.pem"
-    ${pkgs.docker}/bin/docker exec -it wazuh-wazuh.indexer-1 bash "KEY=$INSTALLATION_DIR/certs/admin-key.pem"
-    ${pkgs.docker}/bin/docker exec -it wazuh-wazuh.indexer-1 bash "CERT=$INSTALLATION_DIR/certs/admin.pem"
-    ${pkgs.docker}/bin/docker exec -it wazuh-wazuh.indexer-1 bash "export JAVA_HOME=/usr/share/wazuh-indexer/jdk"
-    ${pkgs.docker}/bin/docker exec -it wazuh-wazuh.indexer-1 bash "bash /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert  $CACERT -cert $CERT -key $KEY -p 9200 -icl"
+
+    INSTALLATION_DIR=/usr/share/wazuh-indexer
+    ${pkgs.docker}/bin/docker exec \
+        -e JAVA_HOME=/usr/share/wazuh-indexer/jdk \
+        wazuh-wazuh.indexer-1 \
+        /usr/share/wazuh-indexer/plugins/opensearch-security/tools/securityadmin.sh -cd /usr/share/wazuh-indexer/opensearch-security/ -nhnv -cacert  $INSTALLATION_DIR/certs/root-ca.pem -cert $INSTALLATION_DIR/certs/admin.pem -key $INSTALLATION_DIR/certs/admin-key.pem -p 9200 -icl
   '';
 in {
 
