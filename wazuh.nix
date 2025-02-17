@@ -19,10 +19,7 @@ in {
       allowedUDPPorts = [ 514 ];
     };
 
-    environment.etc."wazuh/config" = {
-      src = ./config;
-      recursive = true;
-    };
+    environment.etc."wazuh/config" = { source = ./config; };
 
     environment.etc."wazuh/docker-compose.yml".text =
       #yaml
