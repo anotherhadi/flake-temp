@@ -1,6 +1,6 @@
 { pkgs, lib, config, ... }:
 let
-  certDir = "/var/lib/wazuh-certificates2";
+  certDir = "/var/lib/wazuh-certificates3";
 
   generateCertsScript = pkgs.writeShellScriptBin "generate-wazuh-certs" ''
     set -e
@@ -58,11 +58,11 @@ in {
     };
 
     virtualisation.oci-containers.containers.wazuh-manager.dependsOn =
-      [ "generate-wazuh-certs.service" ];
+      [ "generate-wazuh-certs" ];
     virtualisation.oci-containers.containers.wazuh-dashboard.dependsOn =
-      [ "generate-wazuh-certs.service" ];
+      [ "generate-wazuh-certs" ];
     virtualisation.oci-containers.containers.wazuh-indexer.dependsOn =
-      [ "generate-wazuh-certs.service" ];
+      [ "generate-wazuh-certs" ];
 
     # Modifier les volumes pour utiliser les certificats générés
     virtualisation.oci-containers.containers.wazuh-manager.volumes = [
