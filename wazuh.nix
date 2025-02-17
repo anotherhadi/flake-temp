@@ -227,7 +227,7 @@ in {
       pathConfig = {
         PathModified = [ "/etc/wazuh/config" "/etc/wazuh/docker-compose.yml" ];
       };
-      WantedBy = [ "multi-user.target" ];
+      wantedBy = [ "multi-user.target" ];
     };
   };
 }
