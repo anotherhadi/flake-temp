@@ -10,8 +10,8 @@ let
 
     # Générer l'autorité de certification (CA)
     if [ ! -f root-ca.pem ]; then
-      openssl genrsa -out root-ca.key 2048
-      openssl req -x509 -new -nodes -key root-ca.key -sha256 -days 3650 -out root-ca.pem -subj "/CN=Wazuh Root CA"
+      ${pkgs.openssl} genrsa -out root-ca.key 2048
+      ${pkgs.openssl} req -x509 -new -nodes -key root-ca.key -sha256 -days 3650 -out root-ca.pem -subj "/CN=Wazuh Root CA"
     fi
 
     # Fonction pour générer un certificat signé par la CA
