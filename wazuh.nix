@@ -33,13 +33,13 @@ in {
 
     dashboardUsername = lib.mkOption {
       type = lib.types.str;
-      default = "admin";
+      default = "kibanaserver";
       description = "Username for the Wazuh Dashboard";
     };
 
     dashboardPassword = lib.mkOption {
       type = lib.types.str;
-      default = "MyS3cr37P450r.*-.";
+      default = "kibanaserver";
       description = "Password for the Wazuh Dashboard";
     };
   };
